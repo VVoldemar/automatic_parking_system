@@ -13,7 +13,8 @@ while True:
     ret, frame = cap.read()
 
     if ret:
-        for d in decode(frame, symbols=[ZBarSymbol.QRCODE]):
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        for d in decode(gray, symbols=[ZBarSymbol.QRCODE]):
             s = d.data.decode()
             print(s)
             frame = cv2.rectangle(frame, (d.rect.left, d.rect.top),
