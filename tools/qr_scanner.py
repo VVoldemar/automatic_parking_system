@@ -12,7 +12,6 @@ delay = 1
 window_name = 'OpenCV pyzbar'
 
 cap = cv2.VideoCapture(camera_id)
-decoder = cv2.QRCodeDetector()
 # cv2.resizeWindow(window_name, 840, 640)
 print("started")
 while True:
