@@ -27,23 +27,9 @@ while True:
         decoded_str, info = qreader.detect_and_decode(frame, True)
 
         for text, qr_data in zip(decoded_str, info):
-            # xyxy = qr_data["bbox_xyxy"]
-            # xyxy = list(map(int, xyxy))
-            # xyxy = [np.array([
-            #     [xyxy[0], xyxy[1]],
-            #     [xyxy[0], xyxy[2]],
-            #     [xyxy[1], xyxy[1]],
-            #     [xyxy[1], xyxy[2]],
-            # ])]
-            # polygon_xy = qr_data["polygon_xy"]
             padded_quad_xy: NDArray = qr_data["padded_quad_xy"]
             center = qr_data["cxcy"]
             center = list(map(int, center))
-
-            # padded_quad_xy.shape
-            # print(padded_quad_xy.shape, padded_quad_xy.dtype, padded_quad_xy)
-            # padded_quad_xy.astype(int)
-            print(text, padded_quad_xy, center)
             
             if text:
                 color = (0, 255, 0)
