@@ -53,6 +53,8 @@ class Camera:
 
                 if data != None:
                         self.last_img = data
+
+                sleep(0.1)
                 
 
             except Exception as e:

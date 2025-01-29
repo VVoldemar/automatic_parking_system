@@ -5,6 +5,7 @@ from threading import Thread
 class SocketServer:
     server: socket
     therad: Thread
+    should_stop: bool = False
 
     def __init__(self):
         self.server = socket(AF_INET)
@@ -26,7 +27,7 @@ class SocketServer:
     def process_client(self, client: socket, addr):
         while True:
             data = client.recv(2048)
-            if data == None or len(data) == 0:
+            if data == None or len(data) == 0 or self.should_stop:
                 break
             print(addr[0], data.decode())
         client.close()
