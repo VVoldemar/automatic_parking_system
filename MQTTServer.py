@@ -21,7 +21,7 @@ class MQTTServer:
     machine_state: MachineStates
     last_packet: datetime
 
-    def __init__(self, broker = "localhost", sub = "esp", pub="rasp"):
+    def __init__(self, broker = "localhost", sub = "esp", pub = "rasp"):
         self._broker = broker
         self._publishing_topic = pub
         self._subscription_topic = sub
