@@ -8,9 +8,7 @@ class LiftController:
     rotation: int # clockwise increases
     floor: int
 
-
-
-    def __init__(self, rotation_motor: MotorController = None, liffting_motor: MotorController = None):
+    def __init__(self, rotation_motor: MotorController | None = None, liffting_motor: MotorController | None = None):
         if not rotation_motor:
             rotation_motor = MotorController(Constants.PIN_ROTATION_DIRECTION, Constants.PIN_ROTATION_PULSE)
         if not liffting_motor:

@@ -10,8 +10,8 @@ class Camera:
 
     thread: Thread
 
-    last_img: bytes
-    last_detection: str
+    last_img: bytes | None
+    last_detection: str | None
 
     def __init__(self, camera_id = 0):
         self.camera = VideoCapture(camera_id)

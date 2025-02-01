@@ -1,14 +1,17 @@
 from paho.mqtt.client import Client, MQTTMessage
 from enum import Enum, auto
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from threading import Thread
+from time import sleep
 
 class MachineStates(Enum):
     Disconnected = auto()
     Ready = auto()
     Moving_forward = auto()
+    Moving_backward = auto()
     Wait_ok__config = auto()
     Wait_ok_forward = auto()
+    Wait_ok_backward = auto()
 
 
 class MQTTServer:
@@ -36,6 +39,9 @@ class MQTTServer:
         self.listen_thread = Thread(target=client.loop_start)
         self.listen_thread.start()
 
+    def is_alive(self):
+        return self.last_packet + timedelta(minutes=2, seconds=30) > datetime.now(timezone.utc)
+
     def move_machine_forward(self):
         # thread unsafe code :D
         # D:
@@ -45,6 +51,21 @@ class MQTTServer:
         
         self._publish("forward")
         self.machine_state = MachineStates.Wait_ok_forward
+
+    def move_machine_backward(self):
+        if self.machine_state != MachineStates.Ready:
+            return
+        
+        self._publish("backward")
+        self.machine_state = MachineStates.Wait_ok_backward
+
+    def wait_for(self, state: MachineStates) -> bool:
+        while self.is_alive():
+            if self.machine_state == state:
+                return True
+
+            sleep(0.005)
+        return False
 
     def _on_connect(self, client: Client, userdata, flags, rc):
         print(f"Connected with result code {rc}")
@@ -63,6 +84,11 @@ class MQTTServer:
             self.machine_state = MachineStates.Moving_forward
         elif data == "done forward" and self.machine_state == MachineStates.Moving_forward:
             self.machine_state = MachineStates.Ready
+        elif data == "ok backward" and self.machine_state == MachineStates.Wait_ok_backward:
+            self.machine_state = MachineStates.Moving_backward
+        elif data == "done backward" and self.machine_state == MachineStates.Moving_backward:
+            self.machine_state = MachineStates.Ready
+
 
         self.last_packet = datetime.now(timezone.utc)
 

@@ -1,8 +1,8 @@
 from Camera import Camera
 from WebServer import start_web_server
-from SocketServer import SocketServer
-
 from MQTTServer import MQTTServer
+from Core import Core
+from LiftController import LiftController
 
 
 def main():
@@ -10,6 +10,9 @@ def main():
     flask_thread = start_web_server(camera)
 
     server = MQTTServer()
+
+    lift = LiftController()
+    core = Core(camera, lift, server)
 
     flask_thread.join()
     server._client.disconnect()
