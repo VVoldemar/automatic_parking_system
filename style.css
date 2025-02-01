@@ -1,0 +1,79 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    height: 100px;
+    box-shadow: 1px 4px 8px 0px rgba(34, 60, 80, 0.2);
+    padding-left: 3rem;
+    margin-bottom: 30px;
+}
+
+.header__title {
+    align-self: center;
+    text-align: center;
+}
+
+.section {
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    max-width: 1920px;
+    padding: 2rem;
+    flex-wrap: wrap;
+    gap: 100px;
+}
+
+.section__side {
+    display: flex;
+    /* min-width: inherit; */ /* Удаляем это */
+}
+
+.section__side:nth-child(1) {
+    flex: 3;
+}
+
+.section__side:nth-child(2) {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 1200px;
+}
+
+.section__side--canvas { /* Стили для контейнера с canvas */
+    width: 100%;
+    /* margin-bottom: 100px; */
+}
+
+.canvas {
+    width: 100%; /* Растягиваем canvas на всю ширину */
+    height: auto; /* Высота автоматически, сохраняя пропорции */
+    /* height: 150px;  Если нужна фиксированная высота */
+    background-color: grey; /* Добавлено для лучшей совместимости с border-radius */
+    /* margin-right: 100px; */
+    min-width: 600px;
+    aspect-ratio: 4 / 3;
+}
+
+/* Остальные стили без изменений */
+.form {
+    display: flex;
+    flex-direction: column;
+}
+.form__fieldset {
+    display: flex;
+    flex-direction: column;
+}
+.form__fieldset__legend {
+}
+.form__fieldset__legend__button {
+}
