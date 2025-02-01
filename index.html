@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Dashboard</title>
+</head>
+<body>
+    <header class="header mod--corner">
+        <h1 class="header__title">Automatc parking system dashboard</h1>
+    </header>
+    <section class="section">
+        <div class="section__side">
+            <canvas class="canvas mod--corner section__side--canvas"></canvas>
+        </div>
+        <div class="section__side">
+            <form class="form mod--corner" action="">
+                <fieldset class="form__fieldset"></legend>
+                    <legend class="form__fieldset__legend">
+                        <button class="form__fieldset__legend__button">Turn on</button>
+                        <button class="form__fieldset__legend__button">Turn off</button>
+                        <button class="form__fieldset__legend__button"></button>
+                </fieldset>
+                <fieldset class="form__fieldset">
+                    <legend class="form__fieldset__legend"></legend>
+                        <button class="form__fieldset__legend__button">System 1</button>
+                        <button class="form__fieldset__legend__button">System 2</button>
+                        <button class="form__fieldset__legend__button">System 3</button>
+                </fieldset>
+            </form>
+        </div>
+    </section>
+    <script>
+        function setBorderRadius(elements) {
+            const coefficient = 0.05;
+
+            elements.forEach((element) => {
+                const width = element.offsetWidth;
+                const height = element.offsetHeight;
+                const minSide = Math.min(width, height);
+                const borderRadius = minSide * coefficient;
+
+                if (element.tagName === "HEADER") {
+                    // Скругляем только нижние углы у header
+                    element.style.borderRadius = `0px 0px ${borderRadius}px ${borderRadius}px`;
+                } else {
+                    element.style.borderRadius = `${borderRadius}px`;
+                }
+            });
+        }
+
+        const myElements = document.querySelectorAll(".mod--corner");
+        setBorderRadius(myElements);
+    </script>
+</body>
+</html>
