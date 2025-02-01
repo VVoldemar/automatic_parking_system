@@ -68,7 +68,8 @@ class Core:
         self.lift.move_to(0, 0)
         
         self.mqtt.move_machine_backward()
-        self.machines[machine_id] = (-1, 0)
+        
+        self.machines.pop(machine_id)
 
         if not self.mqtt.wait_for(MachineStates.Ready):
             return
