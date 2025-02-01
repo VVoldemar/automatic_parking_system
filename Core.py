@@ -41,6 +41,9 @@ class Core:
         if floor == None or rotation == None:
             return
         
+        if self.lift.floor != 0 or self.lift.rotation != 0:
+            self.lift.move_to(0, 0)
+        
         self.mqtt.move_machine_forward()
         if not self.mqtt.wait_for(MachineStates.Ready):
             return
