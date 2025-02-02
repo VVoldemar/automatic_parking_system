@@ -4,6 +4,8 @@ from datetime import datetime, timezone, timedelta
 from threading import Thread
 from time import sleep
 
+import Constants
+
 class MachineStates(Enum):
     Disconnected = auto()
     Ready = auto()
@@ -76,7 +78,7 @@ class MQTTServer:
         
         data = msg.payload.decode()
         if data == "hello" and self.machine_state == MachineStates.Disconnected:
-            self._publish("config ")
+            self._publish(f"config {Constants.STOP_DISTANCE}")
             self.machine_state = MachineStates.Wait_ok__config
         elif data == "ok config" and self.machine_state == MachineStates.Wait_ok__config:
             self.machine_state = MachineStates.Ready
