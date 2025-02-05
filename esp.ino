@@ -2,15 +2,17 @@
 // #include <MQTTClient.h>
 #include <MQTT.h>
 
-#define LEFT_WHEEL D4
+#define LEFT_WHEEL D5
 #define RIGHT_WHEEL D6
-#define LEFT_WHEEL_DIRECTION D5 //?
+#define LEFT_WHEEL_DIRECTION D4 //?
 #define RIGHT_WHEEL_DIRECTION D7 //?
 
-const char WIFI_SSID[] = "Damn_TCPY";
-const char WIFI_PASSWORD[] = "MQTTT-1";
+#define SOUND_SPEED 0.034
 
-const char MQTT_BROKER_ADRRESS[] = "192.168.0.15";
+const char WIFI_SSID[] = "MQTTT-1";
+const char WIFI_PASSWORD[] = "11223344";
+
+const char MQTT_BROKER_ADRRESS[] = "10.42.0.1";
 const int MQTT_PORT = 1883;
 const char MQTT_CLIENT_ID[] = "esp";
 const char MQTT_USERNAME[] = "";
@@ -19,10 +21,18 @@ const char MQTT_PASSWORD[] = "";
 const char PUBLISH_TOPIC[] = "esp";
 const char SUBSCRIBE_TOPIC[] = "rasp";
 
-const int PUBLISH_INTERVAL = 5000;
+const int PUBLISH_INTERVAL = 1000;
+
+const int trigPin = D2;
+const int echoPin = D3;
 
 WiFiClient network;
 MQTTClient mqtt = MQTTClient(256);
+
+unsigned long lastPublishTime = 0;
+
+int FORWARD_STOP_DISTANCE = 5;
+int BACKWARD_STOP_DISTANCE = 5;
 
 void setup() {
   Serial.begin(9600);
@@ -31,6 +41,8 @@ void setup() {
   pinMode(D5, OUTPUT);
   pinMode(D6, OUTPUT);
   pinMode(D7, OUTPUT);
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
 
   int status = WL_IDLE_STATUS;
   while (status != WL_CONNECTED) {
@@ -51,6 +63,11 @@ void setup() {
 
 void loop() {
   mqtt.loop();
+
+  if (millis() - lastPublishTime > PUBLISH_INTERVAL) {
+    sendToRB(String(millis()));
+    lastPublishTime = millis();
+  }
 }
 
 void connectToRB() {
@@ -88,26 +105,83 @@ void sendToRB(const String &data) {
   Serial.println(data);
 }
 
+void setConfig(String &payload) {
+  // parse the payload and set the config
+  FORWARD_STOP_DISTANCE = payload.substring(7).toFloat();
+  Serial.println("Arduino - set config: " + String(FORWARD_STOP_DISTANCE));
+  
+}
+
 void messageHandler(String &topic, String &payload) {
-  if (payload == "forward"){
-    move();
+  if (payload.length >= 6 && payload.substring(0, 6) == "config"){
+    setConfig(payload);
+  }
+
+  else if (payload == "forward"){
+    moveForward();
+  }
+
+  else if (payload == "backward"){
+    moveBackward();
   }
 }
 
-void move(){
+void moveForward(){
     sendToRB("ok forward");  // why just don't use json?
 
-    while (!enoughDistance){
-        digitalWrite(LEFT_WHEEL, HIGH);
-        digitalWrite(RIGHT_WHEEL, HIGH);
+    digitalWrite(LEFT_WHEEL, HIGH);
+    digitalWrite(RIGHT_WHEEL, HIGH);
+    digitalWrite(LEFT_WHEEL_DIRECTION, HIGH);
+    digitalWrite(RIGHT_WHEEL_DIRECTION, LOW);
+
+    while (!enoughDistance(FORWARD_STOP_DISTANCE)){
+      delay(100);
     }
 
     digitalWrite(LEFT_WHEEL, LOW);
     digitalWrite(RIGHT_WHEEL, LOW);
+    digitalWrite(LEFT_WHEEL_DIRECTION, LOW);
+    digitalWrite(RIGHT_WHEEL_DIRECTION, LOW);
 
     sendToRB("done forward");  // why just don't use json?
 }
 
-bool enoughDistance(){
-    return false;
+bool enoughDistance(int &dist){
+  return getDistance() <= dist;
+}
+
+float getDistance(){
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  
+  duration = pulseIn(echoPin, HIGH);
+  distanceCm = duration * SOUND_SPEED / 2;
+
+  Serial.print("Distance (cm): ");
+  Serial.println(distanceCm);
+  return distance;
+}
+
+void moveBackward(){
+  sendToRB("ok backward");  // why just don't use json?
+
+  digitalWrite(LEFT_WHEEL, HIGH);
+  digitalWrite(RIGHT_WHEEL, HIGH);
+  digitalWrite(LEFT_WHEEL_DIRECTION, LOW);
+  digitalWrite(RIGHT_WHEEL_DIRECTION, HIGH);
+
+  while (!enoughDistance(BACKWARD_STOP_DISTANCE)){
+    delay(100);
+  }
+
+  digitalWrite(LEFT_WHEEL, LOW);
+  digitalWrite(RIGHT_WHEEL, LOW);
+  digitalWrite(LEFT_WHEEL_DIRECTION, LOW);
+  digitalWrite(RIGHT_WHEEL_DIRECTION, LOW);
+
+  sendToRB("done backward");  // why just don't use json?
 }
