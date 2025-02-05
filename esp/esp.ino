@@ -9,6 +9,8 @@
 
 #define SOUND_SPEED 0.034
 
+#define NO_DISTANCE_MODULE
+
 const char WIFI_SSID[] = "MQTTT-1";
 const char WIFI_PASSWORD[] = "11223344";
 
@@ -21,7 +23,7 @@ const char MQTT_PASSWORD[] = "";
 const char PUBLISH_TOPIC[] = "esp";
 const char SUBSCRIBE_TOPIC[] = "rasp";
 
-const int PUBLISH_INTERVAL = 1000;
+const int PUBLISH_INTERVAL = 10000;
 
 const int trigPin = D2;
 const int echoPin = D3;
@@ -49,7 +51,7 @@ void setup() {
     Serial.print("Arduino - Attempting to connect to SSID: ");
     Serial.println(WIFI_SSID);
     status = WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-
+    Serial.println(status);
     delay(5000);
   }
 
@@ -58,7 +60,7 @@ void setup() {
 
   connectToRB();
 
-  sendToRB("hi");
+  sendToRB("hello");
 }
 
 void loop() {
@@ -108,12 +110,13 @@ void sendToRB(const String &data) {
 void setConfig(String &payload) {
   // parse the payload and set the config
   FORWARD_STOP_DISTANCE = payload.substring(7).toFloat();
+  BACKWARD_STOP_DISTANCE = payload.substring(7).toFloat();
   Serial.println("Arduino - set config: " + String(FORWARD_STOP_DISTANCE));
-  
+  sendToRB("ok config");
 }
 
 void messageHandler(String &topic, String &payload) {
-  if (payload.length >= 6 && payload.substring(0, 6) == "config"){
+  if (payload.length() >= 6 && payload.substring(0, 6) == "config"){
     setConfig(payload);
   }
 
@@ -147,7 +150,12 @@ void moveForward(){
 }
 
 bool enoughDistance(int &dist){
+#ifdef NO_DISTANCE_MODULE
+  delay(2000);
+  return true;
+#else
   return getDistance() <= dist;
+#endif
 }
 
 float getDistance(){
@@ -158,12 +166,12 @@ float getDistance(){
   delayMicroseconds(10);
   digitalWrite(trigPin, LOW);
   
-  duration = pulseIn(echoPin, HIGH);
-  distanceCm = duration * SOUND_SPEED / 2;
+  long duration = pulseIn(echoPin, HIGH);
+  float distanceCm = duration * SOUND_SPEED / 2.0;
 
   Serial.print("Distance (cm): ");
   Serial.println(distanceCm);
-  return distance;
+  return distanceCm;
 }
 
 void moveBackward(){

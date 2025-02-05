@@ -1,8 +1,11 @@
+from re import S
+import sys
 from paho.mqtt.client import Client, MQTTMessage
 from enum import Enum, auto
 from datetime import datetime, timezone, timedelta
 from threading import Thread
 from time import sleep
+import subprocess
 
 import Constants
 
@@ -32,14 +35,19 @@ class MQTTServer:
         self._subscription_topic = sub
         self.machine_state = MachineStates.Disconnected
 
+        subprocess.run(["mosquitto", "-d", "-c", "mosquitto.conf"], capture_output=True)
+        print("mosquitto started")
+
         client = self._client = Client()
         client.on_connect = self._on_connect
         client.on_message = self._on_message
 
         client.connect(self._broker, 1883, 60)
 
-        self.listen_thread = Thread(target=client.loop_start)
+        self.listen_thread = Thread(target=self._loop_forever)
         self.listen_thread.start()
+
+        self.last_packet = datetime.now(timezone.utc)
 
     def is_alive(self):
         return self.last_packet + timedelta(minutes=2, seconds=30) > datetime.now(timezone.utc)
@@ -74,8 +82,6 @@ class MQTTServer:
         client.subscribe(self._subscription_topic)
         
     def _on_message(self, client: Client, userdata, msg: MQTTMessage):
-        print(f"Received message: {msg.topic} {msg.payload.decode()}")
-        
         data = msg.payload.decode()
         if data == "hello" and self.machine_state == MachineStates.Disconnected:
             self._publish(f"config {Constants.STOP_DISTANCE}")
@@ -91,8 +97,28 @@ class MQTTServer:
         elif data == "done backward" and self.machine_state == MachineStates.Moving_backward:
             self.machine_state = MachineStates.Ready
 
+        print(f"recived message in {msg.topic}: {data}, machine state: {self.machine_state}")
 
         self.last_packet = datetime.now(timezone.utc)
 
     def _publish(self, msg: str):
+        print(f"sending message: {msg}")
         self._client.publish(self._publishing_topic, msg)
+
+    def _loop_forever(self):
+        print("start mqtt loop")
+        self._client.loop_forever()
+        print("end mqtt loop")
+    
+    def clean_up(self):
+        subprocess.run(["killall", "mosquitto"], capture_output=True)
+        print("mosquitto killed")
+
+if __name__ == "__main__":
+    server: MQTTServer | None = None
+    try:
+        server = MQTTServer()
+        server.listen_thread.join()
+    finally:
+        if server:
+            server.clean_up()

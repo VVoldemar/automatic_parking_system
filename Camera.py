@@ -2,6 +2,7 @@ from cv2 import VideoCapture, QRCodeDetector
 import cv2
 from threading import Thread
 from time import sleep
+from typing import Union
 
 
 class Camera:
@@ -10,8 +11,8 @@ class Camera:
 
     thread: Thread
 
-    last_img: bytes | None
-    last_detection: str | None
+    last_img: Union[bytes, None]
+    last_detection: Union[str, None]
 
     def __init__(self, camera_id = 0):
         self.camera = VideoCapture(camera_id)
@@ -23,6 +24,9 @@ class Camera:
 
         self.thread = Thread(target=self.capture)
         self.thread.start()
+
+        self.last_detection = None
+        self.last_img = None
 
     def capture(self):
         while True:
@@ -37,7 +41,7 @@ class Camera:
                 if ret_qr:
                     for s, p in zip(decoded_info, points):
                         if s:
-                            print(s)
+                            print(f"detected: {s}")
                             color = (0, 255, 0)
                             self.last_detection = s
                         else:
@@ -54,7 +58,7 @@ class Camera:
                 if data != None:
                         self.last_img = data
 
-                sleep(0.1)
+                # sleep(0.1)
                 
 
             except Exception as e:
@@ -79,3 +83,12 @@ class Camera:
         ret = self.last_detection
         self.last_detection = None
         return ret
+    
+    def clean_up(self):
+        self.camera.release()
+        print("releasing camera")
+    
+if __name__ == "__main__":
+    camera = Camera()
+    while True:
+        print(f"got frame {len(camera.get_frame())} len")

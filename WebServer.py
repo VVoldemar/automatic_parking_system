@@ -2,8 +2,9 @@ from threading import Thread
 from Camera import Camera
 from flask import Flask, render_template, Response, request
 import os
+from typing import Union
 
-def start_web_server(camera: Camera = None) -> Thread:
+def start_web_server(camera: Union[Camera, None] = None) -> Thread:
     if not camera:
         camera = Camera()
 

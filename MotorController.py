@@ -1,5 +1,6 @@
 import RPi.GPIO as GPIO
 from time import sleep
+import Constants
 
 class MotorController:
     _direction_pin: int
@@ -16,14 +17,18 @@ class MotorController:
         self._direction_pin = direction_pin
         self._pulse_pin = pulse_pin
 
+        self.possition = 0
+
     def go_steps(self, steps_num: int) -> None:
         is_clockwise = steps_num >= 0
         steps_num = abs(steps_num)
 
+        print(f"rotating {steps_num} steps on {self._pulse_pin} pin")
         for _ in range(steps_num):
             self.pulse(is_clockwise)
+        print("rotated")
 
-    def pulse(self, is_clockwise: bool, delay: float = 0.0005):
+    def pulse(self, is_clockwise: bool, delay: float = Constants.DEFAULT_DELAY):
         GPIO.output(self._direction_pin, not is_clockwise)
         
         GPIO.output(self._pulse_pin, GPIO.HIGH)
@@ -32,3 +37,7 @@ class MotorController:
         sleep(delay)
 
         self.possition += 1 if is_clockwise else -1
+
+    def clean_up(self):
+        GPIO.cleanup(self._direction_pin)
+        GPIO.cleanup(self._pulse_pin)
