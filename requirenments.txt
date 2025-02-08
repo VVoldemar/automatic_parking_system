@@ -3,3 +3,4 @@ paho-mqtt
 opencv-python
 websockets
 RPi.GPIO
+asyncio
