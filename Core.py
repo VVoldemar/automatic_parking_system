@@ -26,7 +26,7 @@ class Core:
     def _goooo(self):
         while True:
             qr = self.camera.get_detection()
-            logging.info(f"Detected QR code: {qr}")
+            logging.info(f"Processing machine with qr: {qr}")
 
             if qr not in self.machines.keys():
                 logging.info(f"Starting loading machine {qr}")
