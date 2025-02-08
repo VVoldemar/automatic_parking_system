@@ -4,76 +4,209 @@
     box-sizing: border-box;
 }
 
+body {
+    font-family: sans-serif;
+    background-color: #f4f7f6;
+}
+
 .header {
     display: flex;
     flex-direction: row;
     align-items: center;
     width: 100%;
-    height: 100px;
-    box-shadow: 1px 4px 8px 0px rgba(34, 60, 80, 0.2);
-    padding-left: 3rem;
-    margin-bottom: 30px;
+    height: 80px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding-left: 2rem;
+    margin-bottom: 20px;
+    background-color: #fff;
 }
 
 .header__title {
-    align-self: center;
-    text-align: center;
+    font-size: 1.5rem;
+    color: #333;
 }
 
 .section {
-    margin: 0 auto;
+    margin: 20px auto;
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
-    max-width: 1920px;
-    padding: 2rem;
+    justify-content: center;
+    max-width: 1200px;
+    padding: 1.5rem;
     flex-wrap: wrap;
-    gap: 100px;
+    gap: 30px;
 }
 
 .section__side {
     display: flex;
-    /* min-width: inherit; */ /* Удаляем это */
 }
 
 .section__side:nth-child(1) {
-    flex: 3;
+    flex: 1 1 auto;
+    /* flex-grow: 1, flex-shrink: 1, flex-basis: auto;  Разрешаем расти и сжиматься */
+    min-width: 600px;
 }
 
 .section__side:nth-child(2) {
-    flex: 1;
-    min-width: 200px;
+    flex: 1 1 auto;
+    /* flex-grow: 1, flex-shrink: 1, flex-basis: auto; Разрешаем расти и сжиматься */
+    min-width: 250px;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    max-width: 1200px;
+    align-items: stretch;
+    max-width: 400px;
 }
 
-.section__side--canvas { /* Стили для контейнера с canvas */
+.section__side--canvas {
     width: 100%;
-    /* margin-bottom: 100px; */
 }
 
 .canvas {
-    width: 100%; /* Растягиваем canvas на всю ширину */
-    height: auto; /* Высота автоматически, сохраняя пропорции */
-    /* height: 150px;  Если нужна фиксированная высота */
-    background-color: grey; /* Добавлено для лучшей совместимости с border-radius */
-    /* margin-right: 100px; */
-    min-width: 600px;
+    width: 100%;
+    height: auto;
+    background-color: #e0e0e0;
     aspect-ratio: 4 / 3;
+    border: 1px solid #ccc;
 }
 
-/* Остальные стили без изменений */
-.form {
+/* Form Styles */
+.window {
     display: flex;
     flex-direction: column;
+    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* margin-bottom: 20px; */
 }
+
+.terminal_window {
+    max-height: 331px;
+}
+
 .form__fieldset {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+}
+
+.form__fieldset:last-child {
+    margin-bottom: 0;
+}
+
+.form__fieldset__legend {
+    font-weight: bold;
+    color: #555;
+    padding: 0 10px;
+    margin-bottom: 10px;
+    display: block;
+    /* Ensure legend behaves as block element */
+}
+
+.form__fieldset__legend__button {
+    padding: 10px 15px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.form__fieldset__legend__button:hover {
+    background-color: #0056b3;
+}
+
+.form__fieldset__legend__button:last-child {
+    margin-right: 0;
+}
+
+.mod--corner {
+    overflow: hidden;
+}
+
+.terminal {
+    border-radius: 5px 5px 0 0;
+    position: relative;
+}
+
+.terminal__top {
+    background: #e0e0e0;
+    color: black;
+    padding: 5px;
+    border-radius: 5px 5px 0 0;
+}
+
+.terminal .terminal__top__btns {
+    position: absolute;
+    top: 7px;
+    left: 5px;
+}
+
+.terminal .circle {
+    width: 12px;
+    height: 12px;
+    display: inline-block;
+    border-radius: 15px;
+    margin-left: 2px;
+    border-width: 1px;
+    border-style: solid;
+}
+
+.terminal__title {
+    text-align: center;
+}
+
+.red {
+    background: #EC6A5F;
+    border-color: #D04E42;
+}
+
+.green {
+    background: #64CC57;
+    border-color: #4EA73B;
+}
+
+.yellow {
+    background: #F5C04F;
+    border-color: #D6A13D;
+}
+
+.clear {
+    clear: both;
+}
+
+.terminal__commands {
+    background: black;
+    color: #7AFB4C;
+    padding: 8px;
+    overflow: auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace;
+}
+
+.terminal {
+    border-radius: 5px 5px 0 0;
+    position: relative;
     display: flex;
     flex-direction: column;
+    max-height: 331px;
+    overflow: hidden;
 }
-.form__fieldset__legend {
+
+.terminal__commands__item {
+    margin-bottom: 5px;
 }
-.form__fieldset__legend__button {
+
+@media screen and (max-width: 650px) {
+    .section__side:nth-child(1) {
+        min-width: unset;
+    }
+}
+
+@media screen and (min-width: 1078px) {
+    .terminal_window {
+        width: 100%;
+    }
 }
