@@ -8,27 +8,42 @@
 </head>
 <body>
     <header class="header mod--corner">
-        <h1 class="header__title">Automatc parking system dashboard</h1>
+        <h1 class="header__title">Automatic parking system dashboard</h1>
     </header>
     <section class="section">
         <div class="section__side">
             <canvas class="canvas mod--corner section__side--canvas"></canvas>
         </div>
         <div class="section__side">
-            <form class="form mod--corner" action="">
-                <fieldset class="form__fieldset"></legend>
-                    <legend class="form__fieldset__legend">
-                        <button class="form__fieldset__legend__button">Turn on</button>
-                        <button class="form__fieldset__legend__button">Turn off</button>
-                        <button class="form__fieldset__legend__button"></button>
+            <div class="window mod--corner" action="">
+                <fieldset class="form__fieldset mod--corner">
+                    <legend class="form__fieldset__legend">Actions</legend>
+                    <button class="form__fieldset__legend__button" onclick="sendMessage('on')">Turn On System</button>
+                    <button class="form__fieldset__legend__button" onclick="sendMessage('off')">Turn Off System</button>
                 </fieldset>
-                <fieldset class="form__fieldset">
-                    <legend class="form__fieldset__legend"></legend>
-                        <button class="form__fieldset__legend__button">System 1</button>
-                        <button class="form__fieldset__legend__button">System 2</button>
-                        <button class="form__fieldset__legend__button">System 3</button>
+                <fieldset class="form__fieldset mod--corner">
+                    <legend class="form__fieldset__legend">Test System</legend>
+                    <button class="form__fieldset__legend__button">Test System 1</button>
+                    <button class="form__fieldset__legend__button">Test System 2</button>
+                    <button class="form__fieldset__legend__button">Test System 3</button>
                 </fieldset>
-            </form>
+            </div>
+        </div>
+        <div class="window terminal_window">
+
+            <div class="terminal">
+                <div class="terminal__top">
+                    <div class="terminal__top__btns">
+                        <span class="circle red"></span>
+                        <span class="circle yellow"></span>
+                        <span class="circle green"></span>
+                    </div>
+                    <div class="terminal__title">console</div>
+                </div>
+                <ul class="terminal__commands" id="log">
+                    <li class="terminal__commands__item">[INFO] Установка соединения...</li>
+                </ul>
+            </div>
         </div>
     </section>
     <script>
@@ -52,6 +67,43 @@
 
         const myElements = document.querySelectorAll(".mod--corner");
         setBorderRadius(myElements);
+    </script>
+    <script>
+        const socket = new WebSocket("ws://localhost:8001/ws");
+
+        socket.onopen = () => {
+            console.log("Соединение установлено");
+            let logDiv = document.getElementById("log");
+            logDiv.innerHTML += `<li class="terminal__commands__item">[INFO] Соединение установлено с сервером</li>`;
+        };
+
+        socket.onmessage = (event) => {
+            let logDiv = document.getElementById("log");
+            // Проверка, прокручен ли вниз с допуском 5px
+            const isScrolledToBottom = logDiv.scrollTop + logDiv.clientHeight >= logDiv.scrollHeight - 5;
+
+            logDiv.innerHTML += `<li class="terminal__commands__item">&gt;  ${event.data}</li>`;
+
+            if (isScrolledToBottom) {
+                logDiv.scrollTop = logDiv.scrollHeight;
+            }
+        };
+
+        socket.onclose = () => {
+            console.log("Соединение закрыто");
+            let logDiv = document.getElementById("log");
+            logDiv.innerHTML += `<li class="terminal__commands__item">[INFO] Соединение с сервером закрыто</li>`;
+        };
+
+        socket.onerror = (error) => {
+            console.error("Ошибка WebSocket:", error);
+            let logDiv = document.getElementById("log");
+            logDiv.innerHTML += `<li class="terminal__commands__item">[ERROR] Ошибка соединения: ${error}</li>`;
+        };
+
+        function sendMessage(msg) {
+            socket.send(msg);
+        }
     </script>
 </body>
 </html>

@@ -2,6 +2,7 @@ from Camera import Camera
 from LiftController import LiftController
 from MQTTServer import MQTTServer, MachineStates
 from threading import Thread
+import logging
 
 class Core:
     lift: LiftController
@@ -25,31 +26,28 @@ class Core:
     def _goooo(self):
         while True:
             qr = self.camera.get_detection()
+            logging.info(f"Detected QR code: {qr}")
 
-            # print(self.machines)
-            
             if qr not in self.machines.keys():
-                print(f"starting loading machine {qr}")
+                logging.info(f"Starting loading machine {qr}")
 
                 code = self.load_machine(qr)
             
                 if code == 0:
-                    print("loaded machine")
+                    logging.info("Loaded machine")
                 else:
-                    print(f"failed to load machine, {code=}")
+                    logging.error(f"Failed to load machine, {code=}")
             else:
-                print(f"starting unloading machine {qr}")
+                logging.info(f"Starting unloading machine {qr}")
                 
                 code = self.unload_machine(qr)
             
                 if code == 0:
-                    print("unloaded machine")
+                    logging.info("Unloaded machine")
                 else:
-                    print(f"failed to unload machine, {code=}")
+                    logging.error(f"Failed to unload machine, {code=}")
             
             self.camera.last_detection = None
-            
-
 
     def load_machine(self, machine_id: str) -> int:
         floor = None
@@ -60,7 +58,7 @@ class Core:
                 floor = i // 4
                 rotation = i % 4
         
-        print(f"loading to {floor=} {rotation=}")
+        logging.info(f"Loading to {floor=} {rotation=}")
         if floor == None or rotation == None:
             return 1
         
@@ -80,7 +78,6 @@ class Core:
         self.machines[machine_id] = (floor, rotation)
 
         return 0
-
 
     def unload_machine(self, machine_id: str) -> int:
 
@@ -104,4 +101,3 @@ class Core:
             return 3
         
         return 0
-

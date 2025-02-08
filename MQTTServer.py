@@ -6,6 +6,7 @@ from datetime import datetime, timezone, timedelta
 from threading import Thread
 from time import sleep
 import subprocess
+import logging
 
 import Constants
 
@@ -51,7 +52,9 @@ class MQTTServer:
         self.last_packet = datetime.now(timezone.utc)
 
     def is_alive(self):
-        return self.last_packet + timedelta(minutes=2, seconds=30) > datetime.now(timezone.utc)
+        alive = self.last_packet + timedelta(minutes=2, seconds=30) > datetime.now(timezone.utc)
+        logging.debug(f"MQTTServer is_alive: {alive}")
+        return alive
 
     def move_machine_forward(self):
         # thread unsafe code :D
@@ -79,7 +82,7 @@ class MQTTServer:
         return False
 
     def _on_connect(self, client: Client, userdata, flags, rc):
-        print(f"Connected with result code {rc}")
+        logging.info(f"Connected with result code {rc}")
         client.subscribe(self._subscription_topic)
         
     def _on_message(self, client: Client, userdata, msg: MQTTMessage):
@@ -101,7 +104,7 @@ class MQTTServer:
         elif data == "done backward" and self.machine_state == MachineStates.Moving_backward:
             self.machine_state = MachineStates.Ready
 
-        print(f"recived message in {msg.topic}: {data}, machine state: {self.machine_state}")
+        logging.info(f"recived message in {msg.topic}: {data}, machine state: {self.machine_state}")
 
         self.last_packet = datetime.now(timezone.utc)
     
@@ -110,13 +113,13 @@ class MQTTServer:
 
 
     def _publish(self, msg: str):
-        print(f"sending message: {msg}")
+        logging.info(f"sending message: {msg}")
         self._client.publish(self._publishing_topic, msg)
 
     def _loop_forever(self):
-        print("start mqtt loop")
+        logging.info("start mqtt loop")
         self._client.loop_forever()
-        print("end mqtt loop")
+        logging.info("end mqtt loop")
     
     def clean_up(self):
         # subprocess.run(["killall", "mosquitto"], capture_output=True)

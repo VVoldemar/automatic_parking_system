@@ -3,7 +3,7 @@ import cv2
 from threading import Thread
 from time import sleep
 from typing import Union
-
+import logging
 
 class Camera:
     camera: VideoCapture
@@ -19,7 +19,7 @@ class Camera:
 
         cam_ret, _ = self.camera.read()
         if not cam_ret:
-            print("camera bruhnulas")
+            logging.error("Camera initialization failed")
             exit(228)
 
         self.thread = Thread(target=self.capture)
@@ -27,6 +27,8 @@ class Camera:
 
         self.last_detection = None
         self.last_img = None
+
+        logging.info("Camera initialized")
 
     def capture(self):
         while True:
@@ -41,7 +43,7 @@ class Camera:
                 if ret_qr:
                     for s, p in zip(decoded_info, points):
                         if s:
-                            print(f"detected: {s}")
+                            logging.info(f"Detected QR code: {s}")
                             color = (0, 255, 0)
                             self.last_detection = s
                         else:
@@ -56,37 +58,32 @@ class Camera:
                 data = img[1].tobytes()
 
                 if data != None:
-                        self.last_img = data
-
-                # sleep(0.1)
-                
+                    self.last_img = data
 
             except Exception as e:
-                print("An exception occured:", e)
+                logging.error(f"An exception occurred: {e}")
 
     def get_frame(self) -> bytes:
-        # print("waiting for frame")
         while not self.last_img:
             sleep(0.005)
-        # print("done")
 
         ret = self.last_img
         self.last_img = None
+        logging.debug("Frame retrieved")
         return ret
     
     def get_detection(self) -> str:
-        # print("waiting for detection")
         while not self.last_detection:
             sleep(0.005)
-        # print("done")
 
         ret = self.last_detection
         self.last_detection = None
+        logging.debug("Detection retrieved")
         return ret
     
     def clean_up(self):
         self.camera.release()
-        print("releasing camera")
+        logging.info("Camera released")
     
 if __name__ == "__main__":
     camera = Camera()
