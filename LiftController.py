@@ -3,21 +3,42 @@ import Constants
 from typing import Union
 
 class LiftController:
-    rotation_motor: MotorController
-    lifting_motor: MotorController
+    vertical_motors: list[MotorController]
+    horizontal_motor: MotorController
 
     rotation: int # clockwise increases
     floor: int
 
     def __init__(self,
-                 rotation_motor: Union[MotorController, None] = None, liffting_motor: Union[MotorController, None] = None):
-        if not rotation_motor:
-            rotation_motor = MotorController(Constants.PIN_ROTATION_DIRECTION, Constants.PIN_ROTATION_PULSE)
-        if not liffting_motor:
-            liffting_motor = MotorController(Constants.PIN_LIFTING_DIRECTION, Constants.PIN_LIFTING_PULSE)
-        
-        self.lifting_motor = liffting_motor
-        self.rotation_motor = rotation_motor
+                 horizontal_motor: Union[MotorController, None] = None,
+                 vertical_motors: Union[list[MotorController], None] = None):
+        if not horizontal_motor:
+            horizontal_motor = MotorController(
+                Constants.MOTOR_HORIZONTAL_DIRECTION,
+                Constants.MOTOR_HORIZONTAL_PULSE,
+                Constants.DELAY_HORIZONTAL
+            )
+        if not vertical_motors:
+            vertical_motors = [
+                MotorController(
+                    Constants.MOTOR_VERTICAL1_DIRECTION,
+                    Constants.MOTOR_VERTICAL1_PULSE,
+                    Constants.DELAY_VERTICAL
+                ),
+                MotorController(
+                    Constants.MOTOR_VERTICAL2_DIRECTION,
+                    Constants.MOTOR_VERTICAL2_PULSE,
+                    Constants.DELAY_VERTICAL
+                ),
+                MotorController(
+                    Constants.MOTOR_VERTICAL3_DIRECTION,
+                    Constants.MOTOR_VERTICAL3_PULSE,
+                    Constants.DELAY_VERTICAL
+                ),
+            ]
+            
+        self.vertical_motors = vertical_motors
+        self.horizontal_motor = horizontal_motor
 
         self.floor = 0
         self.rotation = 0
@@ -33,15 +54,20 @@ class LiftController:
         if rel_rot > 2:
             rel_rot -= 4
         
-        self.lifting_motor.go_steps(rel_floor * Constants.STEPS_IN_FLOOR)
-        self.rotation_motor.go_steps(rel_rot * Constants.STEPS_IN_QUATER_ROTATION)
+        tasks = [motor.run_go_steps(-rel_floor * Constants.MICROSTEPS_IN_FLOOR) for motor in self.vertical_motors]
+
+        self.horizontal_motor.go_steps(rel_rot * Constants.MICROSTEPS_IN_QUATER_ROTATION)
+
+        for i in tasks:
+            i.join()
         
         self.floor = floor
         self.rotation = rotation
 
     def clean_up(self):
-        self.lifting_motor.clean_up()
-        self.rotation_motor.clean_up()
+        self.horizontal_motor.clean_up()
+        for motor in self.vertical_motors:
+            motor.clean_up()
 
 
 
