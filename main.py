@@ -4,11 +4,11 @@ from WebServer import start_web_server
 from MQTTServer import MQTTServer
 from Core import Core
 from LiftController import LiftController
-from Websockets import WebSocketHandler
+from WebSockets import WebSocketHandler
 
 import asyncio
 import logging
-import Websockets
+import WebSockets
 
 def main():
     camera: Camera | None = None
@@ -18,16 +18,16 @@ def main():
     core: Core | None = None
 
     logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
 
     file_handler = logging.FileHandler('app.log')
     file_handler.setLevel(logging.DEBUG)
 
     ws_handler = WebSocketHandler()
-    ws_handler.setLevel(logging.DEBUG)
+    ws_handler.setLevel(logging.INFO)
 
     console_handler = logging.StreamHandler()
-    console_handler.setLevel(logging.DEBUG)
+    console_handler.setLevel(logging.INFO)
 
     formatter = logging.Formatter('[%(levelname)s %(asctime)s] %(message)s', datefmt='%H:%M:%S')
     file_handler.setFormatter(formatter)
@@ -38,17 +38,18 @@ def main():
     logger.addHandler(ws_handler)
     logger.addHandler(console_handler)
 
+    logging.info("starting...")
+
     try:
         camera = Camera()
-        flask_thread = start_web_server(camera)
-
         server = MQTTServer()
         lift = LiftController()
 
         core = Core(camera, lift, server)
+        flask_thread = start_web_server(camera, core)
 
         logging.info("Application started")
-        flask_thread.join()
+        core.thread.join()
     finally:
         logging.info("Application stopping")
         if camera:
@@ -60,5 +61,6 @@ def main():
         logging.info("Application stopped")
 
 if __name__ == "__main__":
-    asyncio.run(Websockets.main())
+    # asyncio.create_task(Websockets.main())
+    WebSockets.run()
     main()

@@ -69,7 +69,7 @@
         setBorderRadius(myElements);
     </script>
     <script>
-        const socket = new WebSocket("ws://localhost:8001/ws");
+        const socket = new WebSocket("ws://${window.location.host}:8001/ws");
 
         socket.onopen = () => {
             console.log("Соединение установлено");

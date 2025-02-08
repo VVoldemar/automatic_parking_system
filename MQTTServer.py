@@ -79,10 +79,11 @@ class MQTTServer:
                 return True
 
             sleep(0.005)
+        self.machine_state = MachineStates.Disconnected
         return False
 
     def _on_connect(self, client: Client, userdata, flags, rc):
-        logging.info(f"Connected with result code {rc}")
+        logging.info(f"Connected to mqtt broker with result code {rc}")
         client.subscribe(self._subscription_topic)
         
     def _on_message(self, client: Client, userdata, msg: MQTTMessage):

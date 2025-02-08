@@ -4,6 +4,7 @@ from threading import Thread
 from time import sleep
 from typing import Union
 import logging
+from datetime import timedelta, datetime, timezone
 
 class Camera:
     camera: VideoCapture
@@ -72,9 +73,12 @@ class Camera:
         logging.debug("Frame retrieved")
         return ret
     
-    def get_detection(self) -> str:
+    def get_detection(self, timeout: Union[timedelta, None] = None) -> Union[str, None]:
+        start = datetime.now(timezone.utc)
         while not self.last_detection:
             sleep(0.005)
+            if timeout != None and datetime.now(timezone.utc) - start > timeout:
+                return None
 
         ret = self.last_detection
         self.last_detection = None

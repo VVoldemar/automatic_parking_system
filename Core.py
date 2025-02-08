@@ -1,7 +1,10 @@
-from Camera import Camera
-from LiftController import LiftController
 from MQTTServer import MQTTServer, MachineStates
+from LiftController import LiftController
+from datetime import timedelta
 from threading import Thread
+from Camera import Camera
+from typing import Union
+from time import sleep
 import logging
 
 class Core:
@@ -10,13 +13,17 @@ class Core:
     mqtt: MQTTServer
 
     machines: dict[str, tuple[int, int]]
-
+    is_active: bool
     thread: Thread
+    should_shutdown: bool
 
     def __init__(self, camera: Camera, lift: LiftController, mqtt: MQTTServer):
         self.camera = camera
         self.lift = lift
         self.mqtt = mqtt
+
+        self.is_active = False
+        self.should_shutdown = False
 
         self.thread = Thread(target=self._goooo)
         self.thread.start()
@@ -24,8 +31,15 @@ class Core:
         self.machines = {}
 
     def _goooo(self):
-        while True:
-            qr = self.camera.get_detection()
+        while not self.should_shutdown:
+            if not self.is_active:
+                sleep(1)
+                continue
+            qr = self.camera.get_detection(timedelta(seconds=1))
+            if qr == None:
+                continue
+
+                
             logging.info(f"Processing machine with qr: {qr}")
 
             if qr not in self.machines.keys():
