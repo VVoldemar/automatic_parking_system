@@ -1,6 +1,7 @@
 from MotorController import MotorController
 import Constants
 from typing import Union
+import logging
 
 class LiftController:
     rotation_motor: MotorController
@@ -22,8 +23,11 @@ class LiftController:
         self.floor = 0
         self.rotation = 0
 
+        logging.info("LiftController initialized")
+
     def move_to(self, floor: int, rotation: int):
         if not 0 <= floor < 3:
+            logging.error(f"Invalid floor: {floor}")
             return
 
         rel_floor = floor - self.floor
@@ -39,11 +43,12 @@ class LiftController:
         self.floor = floor
         self.rotation = rotation
 
+        logging.info(f"Moved to floor: {floor}, rotation: {rotation}")
+
     def clean_up(self):
         self.lifting_motor.clean_up()
         self.rotation_motor.clean_up()
-
-
+        logging.info("LiftController cleaned up")
 
 if __name__ == "__main__":
     lift = LiftController()

@@ -3,6 +3,7 @@ from Camera import Camera
 from flask import Flask, render_template, Response, request
 import os
 from typing import Union
+import logging
 
 def start_web_server(camera: Union[Camera, None] = None) -> Thread:
     if not camera:
@@ -21,6 +22,7 @@ def start_web_server(camera: Union[Camera, None] = None) -> Thread:
         while True:
             yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + camera.get_frame() + b'\r\n')
 
+
     @app.route("/video_feed")
     def video_feed():
         return Response(gen(),
@@ -28,6 +30,7 @@ def start_web_server(camera: Union[Camera, None] = None) -> Thread:
     
     @app.route("/shutdown")
     def shutdown():
+        logging.info("Shutdown requested")
         f = request.environ.get('werkzeug.server.shutdown')
         if not f:
             os._exit(0)
@@ -37,4 +40,5 @@ def start_web_server(camera: Union[Camera, None] = None) -> Thread:
     flask_thread = Thread(target=start)
     flask_thread.start()
 
+    logging.info("Web server started")
     return flask_thread
