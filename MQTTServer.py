@@ -35,12 +35,13 @@ class MQTTServer:
         self._subscription_topic = sub
         self.machine_state = MachineStates.Disconnected
 
-        subprocess.run(["mosquitto", "-d", "-c", "mosquitto.conf"], capture_output=True)
-        print("mosquitto started")
+        # subprocess.run(["mosquitto", "-d", "-c", "mosquitto.conf"], capture_output=True)
+        # print("mosquitto started")
 
         client = self._client = Client()
         client.on_connect = self._on_connect
         client.on_message = self._on_message
+        client.on_disconnect = self._on_disconnect
 
         client.connect(self._broker, 1883, 60)
 
@@ -84,7 +85,10 @@ class MQTTServer:
     def _on_message(self, client: Client, userdata, msg: MQTTMessage):
         data = msg.payload.decode()
         if data == "hello" and self.machine_state == MachineStates.Disconnected:
-            self._publish(f"config {Constants.STOP_DISTANCE}")
+            self._publish(f"configF {Constants.FORWARD_STOP_DISTANCE}")
+            self._publish(f"configB {Constants.BACKWARD_STOP_DISTANCE}")
+            self._publish(f"configL {Constants.LEFT_MOTOR_SPEED}")
+            self._publish(f"configR {Constants.RIGHT_MOTOR_SPEED}")
             self.machine_state = MachineStates.Wait_ok__config
         elif data == "ok config" and self.machine_state == MachineStates.Wait_ok__config:
             self.machine_state = MachineStates.Ready
@@ -100,6 +104,10 @@ class MQTTServer:
         print(f"recived message in {msg.topic}: {data}, machine state: {self.machine_state}")
 
         self.last_packet = datetime.now(timezone.utc)
+    
+    def _on_disconnect(self, client: Client, userdata, *args):
+        print(f"disconnected {userdata}")
+
 
     def _publish(self, msg: str):
         print(f"sending message: {msg}")
@@ -111,8 +119,9 @@ class MQTTServer:
         print("end mqtt loop")
     
     def clean_up(self):
-        subprocess.run(["killall", "mosquitto"], capture_output=True)
-        print("mosquitto killed")
+        # subprocess.run(["killall", "mosquitto"], capture_output=True)
+        # print("mosquitto killed")
+        ...
 
 if __name__ == "__main__":
     server: MQTTServer | None = None
