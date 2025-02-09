@@ -5,10 +5,13 @@ from MQTTServer import MQTTServer
 from Core import Core
 from LiftController import LiftController
 from WebSockets import WebSocketHandler
+from time import sleep
 
-import asyncio
+import signal
+from multiprocessing import current_process
 import logging
 import WebSockets
+import os
 
 def main():
     camera: Camera | None = None
@@ -16,6 +19,7 @@ def main():
     lift: LiftController | None = None
     flask_thread: Thread | None = None
     core: Core | None = None
+    web_socket: Thread |  None = None
 
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
@@ -48,6 +52,8 @@ def main():
         core = Core(camera, lift, server)
         flask_thread = start_web_server(camera, core)
 
+        web_socket = WebSockets.run()
+
         logging.info("Application started")
         core.thread.join()
     finally:
@@ -60,7 +66,9 @@ def main():
             server._client.disconnect()
         logging.info("Application stopped")
 
+        sleep(3)
+        os.system(f"kill {os.getpid()}")
+    
+
 if __name__ == "__main__":
-    # asyncio.create_task(Websockets.main())
-    WebSockets.run()
     main()

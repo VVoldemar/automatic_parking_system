@@ -18,8 +18,8 @@
             <div class="window mod--corner" action="">
                 <fieldset class="form__fieldset mod--corner">
                     <legend class="form__fieldset__legend">Actions</legend>
-                    <button class="form__fieldset__legend__button" onclick="sendMessage('on')">Turn On System</button>
-                    <button class="form__fieldset__legend__button" onclick="sendMessage('off')">Turn Off System</button>
+                    <button class="form__fieldset__legend__button" onclick="fetch('/api/activate')">Turn On System</button>
+                    <button class="form__fieldset__legend__button" onclick="fetch('/api/deactivate')">Turn Off System</button>
                 </fieldset>
                 <fieldset class="form__fieldset mod--corner">
                     <legend class="form__fieldset__legend">Test System</legend>
@@ -27,6 +27,10 @@
                     <button class="form__fieldset__legend__button">Test System 2</button>
                     <button class="form__fieldset__legend__button">Test System 3</button>
                 </fieldset>
+                <input type="number" id="vertical_steps" value="0"/>
+                <button onclick="moveVertical()">Move lift vertical</button>
+                <input type="number" id="horizontal_steps" value="0"/>
+                <button onclick="moveHorizontal()">Move lift horizontal</button>
             </div>
         </div>
         <div class="window terminal_window">
@@ -63,6 +67,16 @@
                     element.style.borderRadius = `${borderRadius}px`;
                 }
             });
+        }
+
+        function moveVertical() {
+            steps = document.getElementById("vertical_steps").value;
+            fetch("/api/move_vertical?steps=" + steps)
+        }
+
+        function moveHorizontal() {
+            steps = document.getElementById("horizontal_steps").value;
+            fetch("/api/rotate?steps=" + steps)
         }
 
         const myElements = document.querySelectorAll(".mod--corner");

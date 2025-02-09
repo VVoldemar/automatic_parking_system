@@ -33,10 +33,10 @@ async def handler(websocket: ServerConnection):
 async def main():
     global loop
     loop = asyncio.get_event_loop()
-    async with websockets.serve(handler, "localhost", 8001):
+    async with websockets.serve(handler, "0.0.0.0", 8001):
         await asyncio.Future()
 
 def run() -> Thread:
-    t = Thread(target=asyncio.run, args=[main()])
+    t = Thread(target=asyncio.run, args=[main()], daemon=False)
     t.start()
     return t

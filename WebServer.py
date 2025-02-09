@@ -17,34 +17,35 @@ def start_web_server(camera: Union[Camera, None] = None, core_hint: Any = None) 
             return None
         core: Core = core_hint
 
-        @app.route("api/move_vertical")
+        @app.route("/api/move_vertical")
         def move_vertical():
             steps = request.args.get("steps", type=int)
-            if not steps:
+            if steps == None:
                 return app.response_class(status=401)
             tasks = [motor.run_go_steps(steps) for motor in core.lift.vertical_motors]
             for i in tasks:
                 i.join()
             return app.response_class(status=200)
         
-        @app.route("api/rotate")
+        @app.route("/api/rotate")
         def rotate():
             steps = request.args.get("steps", type=int)
-            if not steps:
+            if steps == None:
                 return app.response_class(status=401)
             core.lift.horizontal_motor.go_steps(steps)
             return app.response_class(status=200)
     
-        @app.route("/shutdown")
+        @app.route("/api/shutdown")
         def shutdown():
             core.should_shutdown = True
     
-        @app.route("api/activate")
+        @app.route("/api/activate")
         def activate():
             core.is_active = True
+            core.camera.last_detection = None
             return app.response_class(status=200)
         
-        @app.route("api/deactivate")
+        @app.route("/api/deactivate")
         def deactivate():
             core.is_active = False
             return app.response_class(status=200)
