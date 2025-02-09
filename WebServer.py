@@ -38,6 +38,7 @@ def start_web_server(camera: Union[Camera, None] = None, core_hint: Any = None) 
         @app.route("/api/shutdown")
         def shutdown():
             core.should_shutdown = True
+            return app.response_class(status=200)
     
         @app.route("/api/activate")
         def activate():
