@@ -88,7 +88,7 @@ class MQTTServer:
         
     def _on_message(self, client: Client, userdata, msg: MQTTMessage):
         data = msg.payload.decode()
-        if data == "hello" and self.machine_state == MachineStates.Disconnected:
+        if data == "hello":
             self._publish(f"configF {Constants.FORWARD_STOP_DISTANCE}")
             self._publish(f"configB {Constants.BACKWARD_STOP_DISTANCE}")
             self._publish(f"configL {Constants.LEFT_MOTOR_SPEED}")
@@ -103,6 +103,8 @@ class MQTTServer:
         elif data == "ok backward" and self.machine_state == MachineStates.Wait_ok_backward:
             self.machine_state = MachineStates.Moving_backward
         elif data == "done backward" and self.machine_state == MachineStates.Moving_backward:
+            self.machine_state = MachineStates.Ready
+        elif self.machine_state == MachineStates.Disconnected:
             self.machine_state = MachineStates.Ready
 
         logging.info(f"recived message in {msg.topic}: {data}, machine state: {self.machine_state}")

@@ -58,10 +58,30 @@ class LiftController:
         if rel_rot > 2:
             rel_rot -= 4
         
-        tasks = [motor.run_go_steps(-rel_floor * Constants.MICROSTEPS_IN_FLOOR) for motor in self.vertical_motors]
+        vert_steps = 0
+        if rel_floor == 2:
+            vert_steps = Constants.STEPS_IN_BOTH_FLOORS
+        elif rel_floor == -2:
+            vert_steps = -Constants.STEPS_IN_BOTH_FLOORS
+        elif rel_floor == 1:
+            if self.floor == 0:
+                vert_steps = Constants.STEPS_IN_FLOOR1
+            elif self.floor == 1:
+                vert_steps = Constants.STEPS_IN_FLOOR2
+        elif rel_floor == -1:
+            if self.floor == 2:
+                vert_steps = -Constants.STEPS_IN_FLOOR2
+            elif self.floor == 1:
+                vert_steps = -Constants.STEPS_IN_FLOOR1
+        print(self.floor, rel_floor, vert_steps)
+        
+        tasks = [motor.run_go_steps(vert_steps // 2) for motor in self.vertical_motors]
+        for i in tasks:
+            i.join()
 
-        self.horizontal_motor.go_steps(rel_rot * Constants.MICROSTEPS_IN_QUATER_ROTATION)
+        self.horizontal_motor.go_steps(rel_rot * Constants.STEPS_IN_QUATER_ROTATION)
 
+        tasks = [motor.run_go_steps(vert_steps // 2) for motor in self.vertical_motors]
         for i in tasks:
             i.join()
         

@@ -67,14 +67,25 @@ class Core:
         floor = None
         rotation = None
         
-        for i in range(8):
-            if (i // 4, i % 4) not in self.machines.values():
-                floor = i // 4
-                rotation = i % 4
+        if self.mqtt.machine_state == MachineStates.Disconnected:
+            return 4
+
+        # print(self.machines)
+        for i in range(4):
+            for j in range(1, 3):
+                # print(i, j, not ((j, i) in self.machines.values()))
+                if not ((j, i) in self.machines.values()):
+                    floor = j
+                    rotation = i
+                    break
+            else:
+                continue
+            break
         
         logging.info(f"Loading to {floor=} {rotation=}")
         if floor == None or rotation == None:
             return 1
+        
         
         if self.lift.floor != 0 or self.lift.rotation != 0:
             self.lift.move_to(0, 0)
@@ -85,7 +96,7 @@ class Core:
         
         self.lift.move_to(floor, rotation)
 
-        self.mqtt.move_machine_forward()
+        self.mqtt.move_machine_backward()
         if not self.mqtt.wait_for(MachineStates.Ready):
             return 3
         
@@ -101,7 +112,7 @@ class Core:
 
         self.lift.move_to(floor, rotation)
 
-        self.mqtt.move_machine_backward()
+        self.mqtt.move_machine_forward()
         if not self.mqtt.wait_for(MachineStates.Ready):
             return 2
         

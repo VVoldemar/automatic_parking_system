@@ -37,6 +37,7 @@ int forward_stop_distance = 5;
 int backward_stop_distance = 5;
 int left_motor_speed = 255;
 int right_motor_speed = 255;
+int delay_after_distance = 200;
 
 void setup() {
   Serial.begin(9600);
@@ -125,12 +126,17 @@ void setConfig(String &payload) {
   case 'R':
     right_motor_speed = payload.substring(8).toFloat();
     break;
+  case 'D':
+    delay_after_distance = payload.substring(8).toInt();
+    break;
   }
   Serial.println("Arduino - set config: " + 
     String(forward_stop_distance) + " " + 
     String(backward_stop_distance) + " " +
     String(left_motor_speed) + " " +
-    String(right_motor_speed) + " ");
+    String(right_motor_speed) + " " +
+    String(delay_after_distance));
+
   sendToRB("ok config");
 }
 
@@ -159,6 +165,8 @@ void moveForward(){
   while (!enoughDistance(forward_stop_distance)){
     delay(100);
   }
+
+  delay(delay_after_distance);
 
   digitalWrite(LEFT_WHEEL, LOW);
   digitalWrite(RIGHT_WHEEL, LOW);
@@ -200,6 +208,8 @@ void moveBackward(){
   analogWrite(RIGHT_WHEEL, right_motor_speed);
   digitalWrite(LEFT_WHEEL_DIRECTION, HIGH);
   digitalWrite(RIGHT_WHEEL_DIRECTION, LOW);
+
+  delay(delay_after_distance);
 
   while (enoughDistance(backward_stop_distance)){
     delay(100);
