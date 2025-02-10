@@ -66,7 +66,7 @@ def main():
             server._client.disconnect()
         logging.info("Application stopped")
 
-        sleep(3)
+        sleep(1)
         os.system(f"kill {os.getpid()}")
     
 

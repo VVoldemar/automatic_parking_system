@@ -73,7 +73,7 @@ class LiftController:
                 vert_steps = -Constants.STEPS_IN_FLOOR2
             elif self.floor == 1:
                 vert_steps = -Constants.STEPS_IN_FLOOR1
-        print(self.floor, rel_floor, vert_steps)
+        # print(self.floor, rel_floor, vert_steps)
         
         tasks = [motor.run_go_steps(vert_steps // 2) for motor in self.vertical_motors]
         for i in tasks:

@@ -44,11 +44,13 @@ def start_web_server(camera: Union[Camera, None] = None, core_hint: Any = None) 
         def activate():
             core.is_active = True
             core.camera.last_detection = None
+            logging.info("System is turned on")
             return app.response_class(status=200)
         
         @app.route("/api/deactivate")
         def deactivate():
             core.is_active = False
+            logging.info("System is turned off")
             return app.response_class(status=200)
 
     if not camera:

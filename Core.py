@@ -102,6 +102,8 @@ class Core:
         
         self.machines[machine_id] = (floor, rotation)
 
+        self.is_active = False
+
         return 0
 
     def unload_machine(self, machine_id: str) -> int:
@@ -124,5 +126,7 @@ class Core:
 
         if not self.mqtt.wait_for(MachineStates.Ready):
             return 3
+        
+        self.is_active = False
         
         return 0
