@@ -1,5 +1,5 @@
 from MotorController import MotorController
-import Constants
+from program_code import Constants
 from typing import Union
 import logging
 

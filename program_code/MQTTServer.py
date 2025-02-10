@@ -1,14 +1,12 @@
-from re import S
-import sys
 from paho.mqtt.client import Client, MQTTMessage
 from enum import Enum, auto
 from datetime import datetime, timezone, timedelta
 from threading import Thread
 from time import sleep
-import subprocess
 import logging
 
-import Constants
+from program_code import Constants
+
 
 class MachineStates(Enum):
     Disconnected = auto()
