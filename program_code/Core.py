@@ -2,8 +2,7 @@ from MQTTServer import MQTTServer, MachineStates
 from LiftController import LiftController
 from datetime import timedelta
 from threading import Thread
-from Camera import Camera
-from typing import Union
+from program_code.Camera import Camera
 from time import sleep
 import logging
 
