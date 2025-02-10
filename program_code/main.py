@@ -1,9 +1,9 @@
 from threading import Thread
-from program_code.Camera import Camera
+from Camera import Camera
 from WebServer import start_web_server
 from MQTTServer import MQTTServer
-from program_code.Core import Core
-from program_code.LiftController import LiftController
+from Core import Core
+from LiftController import LiftController
 from WebSockets import WebSocketHandler
 from time import sleep
 

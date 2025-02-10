@@ -5,7 +5,7 @@ from threading import Thread
 from time import sleep
 import logging
 
-from program_code import Constants
+import Constants
 
 
 class MachineStates(Enum):

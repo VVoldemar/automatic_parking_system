@@ -1,9 +1,10 @@
 from threading import Thread
-from program_code.Camera import Camera
+from Camera import Camera
 from flask import Flask, render_template, Response, request, send_from_directory
 from typing import Any, Union
 from time import time, sleep
-from Websockets import WebSocketHandler
+from WebSockets import WebSocketHandler
+import WebSockets
 import logging
 import sys
 
@@ -11,7 +12,7 @@ def start_web_server(camera: Union[Camera, None] = None, core_hint: Any = None) 
     app = Flask(__name__)
 
     if sys.platform == "linux":
-        from program_code.Core import Core
+        from Core import Core
         if not isinstance(core_hint, Core):
             return None
         core: Core = core_hint

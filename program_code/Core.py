@@ -2,7 +2,7 @@ from MQTTServer import MQTTServer, MachineStates
 from LiftController import LiftController
 from datetime import timedelta
 from threading import Thread
-from program_code.Camera import Camera
+from Camera import Camera
 from time import sleep
 import logging
 
@@ -28,6 +28,8 @@ class Core:
         self.thread.start()
 
         self.machines = {}
+
+        logging.info("Core started")
 
     def _goooo(self):
         while not self.should_shutdown:
@@ -70,12 +72,12 @@ class Core:
             return 4
 
         # print(self.machines)
-        for i in range(4):
-            for j in range(1, 3):
+        for i in range(1, 3):
+            for j in range(4):
                 # print(i, j, not ((j, i) in self.machines.values()))
-                if not ((j, i) in self.machines.values()):
-                    floor = j
-                    rotation = i
+                if not ((i, j) in self.machines.values()):
+                    floor = i
+                    rotation = j
                     break
             else:
                 continue
