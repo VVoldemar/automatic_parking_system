@@ -73,7 +73,7 @@ class Core:
 
         # print(self.machines)
         for i in range(1, 3):
-            for j in range(4):
+            for j in [0, 1, 3, 2]:
                 # print(i, j, not ((j, i) in self.machines.values()))
                 if not ((i, j) in self.machines.values()):
                     floor = i
