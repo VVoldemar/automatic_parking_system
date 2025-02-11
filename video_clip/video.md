@@ -1,1 +1,1 @@
-Ссылка на видеоролик: 
+Ссылка на видеоролик: https://vkvideo.ru/video506153733_456239018?list=ln-Q410VyUmrbDWpCRAAN
